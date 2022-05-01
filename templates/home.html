@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Twitter Sentiment</title>
+</head>
+
+<body>
+    <form method="POST">
+        {{ form.csrf_token }}
+        {{ form.twitter_handle.label }}
+        {{ form.twitter_handle() }}
+        <input type="submit", value="submit">
+    </form>
+</body>
+
+</html>

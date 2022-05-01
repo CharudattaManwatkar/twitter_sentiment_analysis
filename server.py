@@ -9,13 +9,20 @@ that indicates the file containing Twitter data in a CSV file format:
 consumer_key, consumer_secret, access_token, access_token_secret
 """
 import sys
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
 from tweetie import *
 from colour import Color
-
+import os
 from numpy import median
 
 app = Flask(__name__)
+SECRET_KEY = os.urandom(32)
+app.config['SECRET_KEY'] = SECRET_KEY
+
+class SearchForm(FlaskForm):
+    twitter_handle = StringField('Twitter Handle')
 
 def add_color(tweets):
     """
@@ -33,14 +40,20 @@ def add_color(tweets):
         t['color'] = colors[norm_score]
 
     return tweets
-        
 
+
+@app.route("/", methods=["GET", "POST"])
+def home():
+    form = SearchForm()
+    if form.validate_on_submit():
+        th = form.twitter_handle.data
+        return redirect(f"/{th}")
+    return render_template('home.html', form=form)
 
 @app.route("/favicon.ico")
 def favicon():
     with open('favicon_small.png', 'rb') as f:
         icon = f.read()
-
     return icon
 
 
@@ -68,8 +81,9 @@ def following(name):
     return render_template('following.html', name=name, friends_list=friends_list)
 
 
-i = sys.argv.index('server:app')
-twitter_auth_filename = sys.argv[i+1] # e.g., "/Users/parrt/Dropbox/licenses/twitter.csv"
+# i = sys.argv.index('server:app')
+# twitter_auth_filename = sys.argv[i+1] # e.g., "/Users/parrt/Dropbox/licenses/twitter.csv"
+twitter_auth_filename = "twitter_combined.csv"
 api = authenticate(twitter_auth_filename)
 
-#app.run(host='0.0.0.0', port=80)
+app.run(host='0.0.0.0', port=80)

@@ -21,7 +21,7 @@ a:hover {
 
 <ul>
     {% for t in record['tweets'] %}
-    <li style="list-style:square; font-size:70%; font-family:Verdana, sans-serif; color:{{t['color']}}">{{t['score']}} :
+    <li style="list-style:square; font-size:85%; font-family:Verdana, sans-serif; color:{{t['color']}}">{{t['score']}} :
         <a style="color:{{t['color']}}" href="https://twitter.com/{{record['user']}}/status/{{t['id']}}">{{t['text']}}</a></li>
     {% endfor %}
 </ul>
