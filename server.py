@@ -9,6 +9,7 @@ that indicates the file containing Twitter data in a CSV file format:
 consumer_key, consumer_secret, access_token, access_token_secret
 """
 import sys
+from aiohttp import request
 from flask import Flask, render_template, redirect, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
@@ -23,6 +24,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 
 class SearchForm(FlaskForm):
     twitter_handle = StringField('Twitter Handle')
+    sentiments = SubmitField(label='Sentiments')
+    followers = SubmitField(label='Followers')
 
 def add_color(tweets):
     """
@@ -45,9 +48,14 @@ def add_color(tweets):
 @app.route("/", methods=["GET", "POST"])
 def home():
     form = SearchForm()
+    # # form2 = SearchForm()
     if form.validate_on_submit():
         th = form.twitter_handle.data
-        return redirect(f"/{th}")
+        if form.sentiments.data:
+            return redirect(f"/{th}")
+        elif form.followers.data:
+            return redirect(f'/following/{th}')
+
     return render_template('home.html', form=form)
 
 @app.route("/favicon.ico")
@@ -81,9 +89,8 @@ def following(name):
     return render_template('following.html', name=name, friends_list=friends_list)
 
 
-# i = sys.argv.index('server:app')
-# twitter_auth_filename = sys.argv[i+1] # e.g., "/Users/parrt/Dropbox/licenses/twitter.csv"
-twitter_auth_filename = "twitter_combined.csv"
-api = authenticate(twitter_auth_filename)
+if __name__ == '__main__':
+    twitter_auth_filename = "twitter_combined.csv"
+    api = authenticate(twitter_auth_filename)
 
-app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=80, debug=True)
